@@ -14,10 +14,11 @@
 
     <h2>Veuillez entrer un nom de département :</h2>
 
-    <select >
-        <option value="">Choisissez un département:</option>
-        <option v-for="(code, dep) in department" :id="code.nom">{{ dep }} {{ code.nom }}</option>
-    </select>
+  
+      <select v-model="selectedDepartment">
+          <option v-for="(code, dep) in department" :id="code.nom" :value="code.nom">{{ code.code }} {{ code.nom }}</option>
+      </select>
+  
 
     <br/></br/>
 
@@ -55,40 +56,48 @@
             adress: "Bordeaux",
             info: null,
             department: null,
+            selectedDepartment: "Gironde",
             loading: true,
             errored: false,
           };
         },
         mounted() {
-            axios
-                .get('https://coronavirusapi-france.now.sh/LiveDataByDepartement?Departement=Gironde')
-                .then(response => {
-                    this.info = response.data.LiveDataByDepartement[0];
-                    
-                })
-                .catch(error => {
-                    console.log(error)
-                    this.errored = true
-                })
-                .finally(() => this.loading = false);
+        axios
+          .get('https://coronavirusapi-france.now.sh/LiveDataByDepartement?Departement=' + this.selectedDepartment)
+          .then(response => {
+              this.info = response.data.LiveDataByDepartement[0];
+              
+          })
+          .catch(error => {
+              console.log(error)
+              this.errored = true
+          })
+          .finally(() => this.loading = false);
 
-                axios
-                .get('https://geo.api.gouv.fr/departements?fields=nom,code,codeRegion')
-                .then(response => {
-                    this.department = response.data;
-                })
-                .catch(error => {
-                    console.log(error)
-                    this.errored = true
-                })
-                .finally(() => this.loading = false);
-            },
-            methods: {
-                copyright(){
-                    const currentYear = new Date().getFullYear();
-                    return `Copyright ${this.myName} ${currentYear}`;
-                }
-            },
+        axios
+          .get('https://geo.api.gouv.fr/departements?fields=nom,code,codeRegion')
+          .then(response => {
+              this.department = response.data;
+          })
+          .catch(error => {
+              console.log(error)
+              this.errored = true
+          })
+          .finally(() => this.loading = false);
+        },
+        methods: {
+          copyright(){
+              const currentYear = new Date().getFullYear();
+              return `Copyright ${this.myName} ${currentYear}`;
+          },
+        },
+        watch: {
+            selectedDepartment(value) {
+                const selectedDepartment = value;
+                console.log(value);
+                return this.selectedDepartment;
+            }
+        }
       });
     </script>
   </body>
