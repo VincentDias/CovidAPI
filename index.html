@@ -1,104 +1,111 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="stylesheet" href="style.css" />
     <title>Covid API with Vue Js</title>
-  </head>
+</head>
 
-  <body>
+<body>
     <div id="app" class="container">
-      <h1>Évolution de la Covid en France</h1>
+        <h1>Évolution de la Covid en France</h1>
 
-    <h2>Veuillez entrer un nom de département :</h2>
+        <h2>Veuillez entrer un nom de département :</h2>
 
-  
-      <select v-model="selectedDepartment">
-          <option v-for="(code, dep) in department" :id="code.nom" :value="code.nom">{{ code.code }} {{ code.nom }}</option>
-      </select>
-  
 
-    <br/></br/>
+        <select v-model="selectedDepartment">
+            <option v-for="(code, dep) in department" :id="code.nom" :value="code.nom">{{ code.code }} {{ code.nom }}
+            </option>
+        </select>
 
-      <section v-if="errored">
-        <p>Nous sommes désolés, nous ne sommes pas en mesure de récupérer ces informations pour le moment. Veuillez réessayer ultérieurement.</p>
-      </section>
-    
-      <section v-else>
-        <div v-if="loading">Chargement...</div>
-    
-        <div
-          v-else
-          v-for="(value, name) in info">
-          {{ name }}:{{ value }}
-        </div>
 
-    <br/><br/>
-        
-      <footer class="footer">
-        <p>Source: {{ info?.source.nom }}</p>
-        <p>{{ copyright() }}</p>
-        
-      </footer>
+        <br /></br />
+
+        <section v-if="errored">
+            <p>Nous sommes désolés, nous ne sommes pas en mesure de récupérer ces informations pour le moment. Veuillez
+                réessayer ultérieurement.</p>
+        </section>
+
+        <section v-else>
+            <div v-if="loading">Chargement...</div>
+
+            <div v-else v-for="(value, name) in info">
+                {{ name }}:{{ value }}
+            </div>
+
+            <br /><br />
+
+            <footer class="footer">
+                <p>Source: {{ info?.source.nom }}</p>
+                <p>{{ copyright() }}</p>
+
+            </footer>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
-      var app = new Vue({
-        el: "#app",
-        data() {
-          return {
-            myName: "Vincent Dias, développeur web",
-            phone: "06 29 46 88 29",
-            adress: "Bordeaux",
-            info: null,
-            department: null,
-            selectedDepartment: "Gironde",
-            loading: true,
-            errored: false,
-          };
-        },
-        mounted() {
-        axios
-          .get('https://coronavirusapi-france.now.sh/LiveDataByDepartement?Departement=' + this.selectedDepartment)
-          .then(response => {
-              this.info = response.data.LiveDataByDepartement[0];
-              
-          })
-          .catch(error => {
-              console.log(error)
-              this.errored = true
-          })
-          .finally(() => this.loading = false);
+        var app = new Vue({
+            el: "#app",
+            data() {
+                return {
+                    myName: "Vincent Dias, développeur web",
+                    phone: "06 29 46 88 29",
+                    adress: "Bordeaux",
+                    info: null,
+                    department: null,
+                    selectedDepartment: "Gironde",
+                    loading: true,
+                    errored: false,
+                };
+            },
+            mounted() {
+                // on lance la récupération d'informations au chargement de la page
+                // avec la valeur par défaut de selectedDepartment
+                this.getData();
 
-        axios
-          .get('https://geo.api.gouv.fr/departements?fields=nom,code,codeRegion')
-          .then(response => {
-              this.department = response.data;
-          })
-          .catch(error => {
-              console.log(error)
-              this.errored = true
-          })
-          .finally(() => this.loading = false);
-        },
-        methods: {
-          copyright(){
-              const currentYear = new Date().getFullYear();
-              return `Copyright ${this.myName} ${currentYear}`;
-          },
-        },
-        watch: {
-            selectedDepartment(value) {
-                const selectedDepartment = value;
-                console.log(value);
-                return this.selectedDepartment;
+                axios
+                    .get('https://geo.api.gouv.fr/departements?fields=nom,code,codeRegion')
+                    .then(response => {
+                        this.department = response.data;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        this.errored = true;
+                    })
+                    .finally(() => this.loading = false);
+            },
+            methods: {
+                copyright() {
+                    const currentYear = new Date().getFullYear();
+                    return `Copyright ${this.myName} ${currentYear}`;
+                },
+                getData() {
+                    axios
+                        .get('https://coronavirusapi-france.now.sh/LiveDataByDepartement?Departement=' + this.selectedDepartment)
+                        .then(response => {
+                            this.info = response.data.LiveDataByDepartement[0];
+
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            this.errored = true;
+                        })
+                        .finally(() => this.loading = false);
+                }
+            },
+            watch: {
+                selectedDepartment(value) {
+                    this.selectedDepartment = value;
+                    // On met à jour les infos avec la nouvelle valeur du select
+                    this.getData();
+                }
             }
-        }
-      });
+        });
     </script>
-  </body>
+</body>
+
 </html>
