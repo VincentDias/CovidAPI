@@ -63,8 +63,6 @@
                 };
             },
             mounted() {
-                // on lance la récupération d'informations au chargement de la page
-                // avec la valeur par défaut de selectedDepartment
                 this.getData();
 
                 axios
@@ -100,7 +98,6 @@
             watch: {
                 selectedDepartment(value) {
                     this.selectedDepartment = value;
-                    // On met à jour les infos avec la nouvelle valeur du select
                     this.getData();
                 }
             }
