@@ -5,7 +5,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="icon" href="covid.png" type="image/png">
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/vue-material/dist/vue-material.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material/dist/theme/default.css">
     <title>Covid API with Vue Js</title>
 </head>
 
@@ -33,14 +36,15 @@
             <div v-if="loading">Chargement...</div>
 
             <div v-else v-for="(value, name) in info">
-                {{ name }}:{{ value }}
+                {{ name }}: {{ value }}
             </div>
 
-            <br /><br />
+            <br/><br/>
 
             <footer class="footer">
                 <p>Source: Santé publique France Data</p>
                 <p>{{ copyright() }}</p>
+
 
             </footer>
     </div>
@@ -91,7 +95,16 @@
                             delete this.info.sourceType;
                             delete this.info.source;
 
-                            
+                            function capitalizeFirstLetter(string) {
+                                return string.charAt(0).toUpperCase() + string.slice(1);
+                            }
+
+                            let newData = {};
+                            for (const [key, value] of Object.entries(response.data.LiveDataByDepartement[0])) {
+                                let newKey = `${capitalizeFirstLetter(key.replace(/([a-z])([A-Z])/g, '$1 $2'))}`;
+                                newData[newKey] = value;
+                            }
+                            this.info = newData;
 
                         })
                         .catch(error => {
